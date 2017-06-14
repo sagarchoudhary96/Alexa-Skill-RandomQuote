@@ -27,7 +27,7 @@ exports.handler = function(event, context, callback) {
 
 var handlers = {
     'LaunchRequest': function () {
-        this.emit('GetNewFactIntent');
+        this.emit('GetQuoteIntent');
     },
     'GetQuoteIntent': function () {
       var speechOutput;
@@ -52,6 +52,9 @@ var handlers = {
               if (data[0].title != ""){
                   result += " by " + data[0].title;
               }
+              result = result.replace(/<p>/g, '');
+              result = result.replace(/<\/p>/g, '');
+              result = result.replace(/\n/g, '');
           }
           callback(result);
         })
