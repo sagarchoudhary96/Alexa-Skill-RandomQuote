@@ -47,6 +47,25 @@ var handlers = {
         request.get(url, function(error, response, body) {
           var data = JSON.parse(body);
           var result = "ERROR";
+          var escapeChars = { lt: '<', gt: '>', quot: '"', apos: "'", amp: '&' };
+
+          //to format string
+          function unescapeHTML(str) {//modified from underscore.string and string.js
+              return str.replace(/\&([^;]+);/g, function(entity, entityCode) {
+                  var match;
+
+                  if ( entityCode in escapeChars) {
+                      return escapeChars[entityCode];
+                  } else if ( match = entityCode.match(/^#x([\da-fA-F]+)$/)) {
+                      return String.fromCharCode(parseInt(match[1], 16));
+                  } else if ( match = entityCode.match(/^#(\d+)$/)) {
+                      return String.fromCharCode(~~match[1]);
+                  } else {
+                      return entity;
+                  }
+              });
+          }
+
           if (data[0].hasOwnProperty('content')) {
               result = data[0].content;
               if (data[0].title != ""){
@@ -55,6 +74,7 @@ var handlers = {
               result = result.replace(/<p>/g, '');
               result = result.replace(/<\/p>/g, '');
               result = result.replace(/\n/g, '');
+              result = unescapeHTML(result);
           }
           callback(result);
         })
